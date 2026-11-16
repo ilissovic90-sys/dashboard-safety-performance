@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#142d4e"><title>SCG | Safety Performance Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{--navy:#142d4e;--blue:#1976a8;--teal:#13a6a0;--yellow:#ffbd17;--orange:#f07836;--red:#e34d59;--green:#36a269;--bg:#f3f6fa;--ink:#243449;--muted:#77869a;--line:#e6ebf1;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,Segoe UI,Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:18px 26px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px}.mark{width:42px;height:42px;border:2px solid var(--yellow);border-radius:50%;display:grid;place-items:center;font-weight:800;color:var(--yellow);font-size:13px}.brand h1{font-size:21px;margin:0;letter-spacing:.5px}.brand small{display:block;color:#b9c9d9;font-size:11px;letter-spacing:1.3px}
+.head-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.period{background:#fff;color:var(--navy);font-weight:800;border-radius:9px;padding:9px 13px}.btn{border:0;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--blue);color:white}.btn.light{background:#fff;color:var(--navy)}.btn.yellow{background:var(--yellow);color:#26364b}.btn.ghost{background:#e9eff5;color:var(--navy)}
+nav{display:flex;gap:7px;padding:12px 24px;background:white;border-bottom:1px solid var(--line);overflow:auto}nav button{border:0;background:transparent;padding:10px 14px;border-radius:8px;color:#526277;font-weight:700;white-space:nowrap;cursor:pointer}nav button.active{background:#eaf2f8;color:var(--navy)}
+main{max-width:1600px;margin:auto;padding:20px 24px 30px}.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.filters label{font-size:12px;color:var(--muted);font-weight:700}.filters select{margin-left:6px;border:1px solid var(--line);padding:8px 10px;border-radius:7px;background:#fff;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;box-shadow:0 3px 12px #1b36500a;min-width:0}.kpis{grid-column:span 12;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{padding:16px;border-radius:12px;background:#fff;border:1px solid var(--line);position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}.kpi:nth-child(2):before{background:var(--red)}.kpi:nth-child(3):before{background:var(--orange)}.kpi:nth-child(4):before{background:var(--teal)}.kpi .label{color:var(--muted);font-size:12px;font-weight:700}.kpi .value{font-size:32px;font-weight:800;color:var(--navy);margin-top:4px}.kpi .sub{font-size:11px;color:var(--muted)}
+.span-8{grid-column:span 8}.span-6{grid-column:span 6}.span-4{grid-column:span 4}.span-3{grid-column:span 3}.span-12{grid-column:span 12}.card h3{font-size:14px;margin:0 0 12px;color:#33465e}.chartbox{height:245px;position:relative}.chartbox.small{height:210px}.chartbox.gauge{height:190px}.gauge-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:3px}.gauge-value{text-align:center;font-size:29px;font-weight:700;color:var(--navy);margin-top:-5px}.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:8px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.two-col{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;background:#f8fafc}td.num{text-align:right;font-variant-numeric:tabular-nums}
+#dataPanel{display:none}#dashboardPanel{display:block}.editor{width:100%;min-height:430px;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;border:1px solid var(--line);border-radius:9px;padding:14px;color:#21364e;background:#fbfcfe;resize:vertical}.help{color:var(--muted);font-size:12px}.status{font-size:12px;font-weight:700;margin-left:10px}.status.ok{color:var(--green)}.status.err{color:var(--red)}.footer{text-align:center;color:#9aa6b4;font-size:11px;margin-top:20px}
+@media(max-width:950px){.span-8,.span-6{grid-column:span 12}.span-4,.span-3{grid-column:span 6}.two-col{grid-template-columns:1fr}}
+@media(max-width:600px){header{padding:15px}.brand h1{font-size:16px}main{padding:14px}.kpis{grid-template-columns:repeat(2,1fr)}.kpi .value{font-size:26px}.span-4,.span-3{grid-column:span 12}.chartbox{height:220px}}
+</style></head>
+<body>
+<header><div class="brand"><div class="mark">SCG</div><div><h1>SAFETY PERFORMANCE</h1><small>HEALTH • SAFETY • ENVIRONMENT</small></div></div>
+<div class="head-right"><div class="period" id="periodLabel">JULY 2025</div><button class="btn light" id="exportBtn">Export data</button><button class="btn yellow" id="editBtn">Manage data</button></div></header>
+<nav><button class="active" data-tab="dashboard">Dashboard</button><button data-tab="data">Data management</button></nav>
+<main>
+<section id="dashboardPanel">
+<div class="filters"><label>Period <select id="monthFilter"><option value="all">Year to date</option></select></label><label>Year <select id="yearFilter"><option>2025</option></select></label><span class="help">Dashboard updates from your saved HSE data.</span></div>
+<div class="grid">
+<div class="kpis">
+<div class="kpi"><div class="label">DAYS WITHOUT LTI</div><div class="value" id="days">38</div><div class="sub">Current reporting period</div></div>
+<div class="kpi"><div class="label">LOST TIME INJURIES</div><div class="value" id="lti">1</div><div class="sub">LTI count</div></div>
+<div class="kpi"><div class="label">WORKING DAYS LOST</div><div class="value" id="wld">28</div><div class="sub">Lost working days</div></div>
+<div class="kpi"><div class="label">NEAR MISS</div><div class="value" id="near">5</div><div class="sub">Reported near misses</div></div>
+</div>
+<div class="card span-8"><h3>Manhours — Direct vs Indirect</h3><div class="chartbox"><canvas id="hoursChart"></canvas></div></div>
+<div class="card span-4"><h3>Frequency rate by month</h3><div class="chartbox"><canvas id="frequencyChart"></canvas></div></div>
+<div class="card span-4"><h3>Severity rate by month</h3><div class="chartbox"><canvas id="severityChart"></canvas></div></div>
+<div class="card span-4"><h3>Safety moments</h3><div class="chartbox small"><canvas id="momentsChart"></canvas></div></div>
+<div class="card span-4"><h3>Equipment inspections</h3><div class="chartbox small"><canvas id="inspectionChart"></canvas></div></div>
+<div class="card span-4"><h3>Safety induction</h3><div class="chartbox small"><canvas id="inductionChart"></canvas></div></div>
+<div class="card span-4"><h3>PTW by type</h3><div class="chartbox small"><canvas id="ptwChart"></canvas></div></div>
+<div class="card span-4"><h3>Safety walks</h3><div class="chartbox gauge"><canvas id="walkChart"></canvas></div><div class="gauge-value" id="walkValue">27</div><div class="gauge-foot"><span>0</span><span id="walkTarget">Target: 52</span></div></div>
+<div class="card span-4"><h3>SALAMA cards</h3><div class="chartbox gauge"><canvas id="salamaChart"></canvas></div><div class="gauge-value" id="salamaValue">46</div><div class="gauge-foot"><span>Resolved</span><span id="salamaTarget">Total: 86</span></div></div>
+<div class="card span-4"><h3>Observations</h3><div class="chartbox gauge"><canvas id="observationChart"></canvas></div><div class="gauge-value" id="observationValue">62</div><div class="gauge-foot"><span>Resolved</span><span id="observationTarget">Total: 102</span></div></div>
+<div class="card span-6"><h3>Injuries by body location</h3><div class="table-wrap"><table id="bodyTable"></table></div></div>
+<div class="card span-6"><h3>Injuries by type</h3><div class="table-wrap"><table id="injuryTable"></table></div></div>
+</div></section>
+<section id="dataPanel"><div class="card"><h2 style="margin:0 0 6px;color:#142d4e">HSE data management</h2><p class="help">Edit the JSON data below, then select “Save & refresh dashboard”. Data is stored in this browser on this device. Use Export data to make a backup and Import JSON to restore it on another device.</p><textarea class="editor" id="dataEditor" spellcheck="false"></textarea><div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:12px"><button class="btn" id="saveBtn">Save & refresh dashboard</button><button class="btn ghost" id="resetBtn">Restore sample data</button><label class="btn ghost" for="importFile">Import JSON</label><input id="importFile" type="file" accept=".json,application/json" hidden><span id="saveStatus" class="status"></span></div></div></section>
+<div class="footer">SCG • Safety Performance Dashboard • Local browser data storage</div>
+</main>
+<script>
+const sample = {
+"year":2025,"selectedMonth":"July",
+"metrics":{"daysWithoutLTI":38,"lti":1,"wld":28,"nearMiss":5},
+"months":[
+{"month":"January","direct":31000,"indirect":76000,"frequency":0,"severity":0},
+{"month":"February","direct":34000,"indirect":85000,"frequency":0,"severity":0},
+{"month":"March","direct":26000,"indirect":84000,"frequency":0,"severity":0},
+{"month":"April","direct":27000,"indirect":84000,"frequency":0,"severity":0},
+{"month":"May","direct":27000,"indirect":84000,"frequency":0,"severity":0},
+{"month":"June","direct":87000,"indirect":103000,"frequency":0,"severity":0},
+{"month":"July","direct":68000,"indirect":29000,"frequency":1,"severity":25}
+],
+"charts":{"safetyMoments":{"labels":["January","February","March","April","May","June"],"values":[182,204,138,309,345,207]},"equipmentInspections":{"labels":["January","February","March","April","May","June","July"],"values":[25,9,12,32,14,22,30]},"safetyInduction":{"labels":["January","February","March","April","May","June","July"],"values":[15,9,8,16,24,57,8]},"ptw":{"labels":["Confined space","Hot work","Work at height","Lifting","Other"],"values":[42.86,32.86,14.2,1.43,8.65]}},
+"targets":{"safetyWalks":{"completed":27,"target":52},"salama":{"resolved":46,"total":86},"observations":{"resolved":62,"total":102}},
+"injuries":{"bodyLocation":[{"name":"Head","count":0},{"name":"Chest","count":0},{"name":"Arm","count":0},{"name":"Hand","count":2},{"name":"Leg","count":0},{"name":"Knee","count":0},{"name":"Feet","count":1}],"type":[{"name":"Muscle pain","count":0},{"name":"Injury","count":0},{"name":"Fracture","count":1},{"name":"Cut","count":0},{"name":"Burn","count":0}]}
+};
+let data = loadData(), charts = {};
+function loadData(){try{return JSON.parse(localStorage.getItem("scgSafetyData"))||structuredClone(sample)}catch(e){return structuredClone(sample)}}
+function saveData(){localStorage.setItem("scgSafetyData",JSON.stringify(data))}
+const colors=["#ffbd17","#f07836","#087fc4","#7650c7","#a00082","#16a6a0","#e34d59","#263e75"];
+function makeChart(id,type,labels,values,extra={}){if(charts[id])charts[id].destroy();const ctx=document.getElementById(id);if(!ctx)return;charts[id]=new Chart(ctx,{type,data:{labels,datasets:[{data:values,backgroundColor:extra.colors||colors,borderWidth:type==="doughnut"?0:1,borderRadius:type==="bar"?4:0, ...extra.dataset}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type==="doughnut",position:"bottom",labels:{boxWidth:8,font:{size:10}}}},scales:type==="bar"||type==="line"?{y:{beginAtZero:true,grid:{color:"#edf1f5"},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}:{},...extra.options}})}
+function makeGauge(id,value,total){makeChart(id,"doughnut",["Completed","Remaining"],[Math.max(0,value),Math.max(0,total-value)],{colors:["#ffbd17","#edf0f4"],options:{rotation:-90,circumference:180,cutout:"78%",plugins:{legend:{display:false},tooltip:{enabled:false}}}})}
+function filteredMonths(){const m=document.getElementById("monthFilter").value;return data.months.filter(x=>m==="all"||x.month===m)}
+function render(){
+ document.getElementById("periodLabel").textContent=(data.selectedMonth||"July").toUpperCase()+" "+data.year;
+ const mf=document.getElementById("monthFilter"), old=mf.value;mf.innerHTML='<option value="all">Year to date</option>'+data.months.map(x=>'<option>'+x.month+'</option>').join("");mf.value=data.months.some(x=>x.month===old)?old:"all";
+ const months=filteredMonths(), metrics=data.metrics;
+ document.getElementById("days").textContent=metrics.daysWithoutLTI;document.getElementById("lti").textContent=metrics.lti;document.getElementById("wld").textContent=metrics.wld;document.getElementById("near").textContent=metrics.nearMiss;
+ const labels=months.map(x=>x.month.slice(0,3));
+ makeChart("hoursChart","bar",labels,[{label:"Direct",data:months.map(x=>x.direct),backgroundColor:"#ffbd17"},{label:"Indirect",data:months.map(x=>x.indirect),backgroundColor:"#142d4e"}],{dataset:{},options:{plugins:{legend:{display:true,position:"bottom"}}}});
+ makeChart("frequencyChart","line",labels,months.map(x=>x.frequency),{colors:["#1686ed"],dataset:{borderColor:"#1686ed",backgroundColor:"#1686ed",tension:.2,pointRadius:3},options:{plugins:{legend:{display:false}}}});
+ makeChart("severityChart","line",labels,months.map(x=>x.severity),{colors:["#1686ed"],dataset:{borderColor:"#1686ed",backgroundColor:"#1686ed",tension:.2,pointRadius:3},options:{plugins:{legend:{display:false}}}});
+ const c=data.charts;makeChart("momentsChart","doughnut",c.safetyMoments.labels,c.safetyMoments.values);makeChart("inspectionChart","doughnut",c.equipmentInspections.labels,c.equipmentInspections.values);makeChart("inductionChart","doughnut",c.safetyInduction.labels,c.safetyInduction.values);makeChart("ptwChart","doughnut",c.ptw.labels,c.ptw.values);
+ const t=data.targets;makeGauge("walkChart",t.safetyWalks.completed,t.safetyWalks.target);makeGauge("salamaChart",t.salama.resolved,t.salama.total);makeGauge("observationChart",t.observations.resolved,t.observations.total);
+ document.getElementById("walkValue").textContent=t.safetyWalks.completed;document.getElementById("walkTarget").textContent="Target: "+t.safetyWalks.target;document.getElementById("salamaValue").textContent=t.salama.resolved;document.getElementById("salamaTarget").textContent="Total: "+t.salama.total;document.getElementById("observationValue").textContent=t.observations.resolved;document.getElementById("observationTarget").textContent="Total: "+t.observations.total;
+ renderTable("bodyTable",data.injuries.bodyLocation);renderTable("injuryTable",data.injuries.type);
+}
+function renderTable(id,rows){document.getElementById(id).innerHTML="<thead><tr><th>Category</th><th style='text-align:right'>Count</th></tr></thead><tbody>"+rows.map(r=>"<tr><td>"+escapeHtml(r.name)+"</td><td class='num'>"+Number(r.count)+"</td></tr>").join("")+"</tbody>";}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function switchTab(tab){document.getElementById("dashboardPanel").style.display=tab==="dashboard"?"block":"none";document.getElementById("dataPanel").style.display=tab==="data"?"block":"none";document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));if(tab==="data")document.getElementById("dataEditor").value=JSON.stringify(data,null,2);}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+document.getElementById("editBtn").onclick=()=>switchTab("data");document.getElementById("monthFilter").onchange=render;
+document.getElementById("saveBtn").onclick=()=>{const s=document.getElementById("saveStatus");try{const parsed=JSON.parse(document.getElementById("dataEditor").value);if(!parsed.months||!parsed.metrics||!parsed.charts||!parsed.targets||!parsed.injuries)throw Error("Missing required data sections.");data=parsed;saveData();render();s.textContent="Saved successfully";s.className="status ok";switchTab("dashboard");}catch(e){s.textContent="Invalid JSON: "+e.message;s.className="status err";}};
+document.getElementById("resetBtn").onclick=()=>{if(confirm("Restore the original sample dashboard data?")){data=structuredClone(sample);saveData();render();document.getElementById("dataEditor").value=JSON.stringify(data,null,2);document.getElementById("saveStatus").textContent="Sample data restored";}};
+document.getElementById("exportBtn").onclick=()=>download(JSON.stringify(data,null,2),"scg-safety-data.json","application/json");
+function download(content,name,type){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+document.getElementById("importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const parsed=JSON.parse(await f.text());data=parsed;saveData();render();switchTab("dashboard");}catch(err){alert("Unable to import this JSON file: "+err.message)}e.target.value="";};
+render();
+</script></body></html>
