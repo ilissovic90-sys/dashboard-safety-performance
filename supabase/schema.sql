@@ -81,40 +81,28 @@ alter table public.hse_actions enable row level security;
 alter table public.hse_incidents enable row level security;
 alter table public.hse_metrics enable row level security;
 
+-- Public dashboard access: read-only for visitors without an account.
+revoke all on table public.profiles from anon, authenticated;
+revoke all on table public.hse_actions, public.hse_incidents, public.hse_metrics from anon, authenticated;
+grant select on table public.hse_actions, public.hse_incidents, public.hse_metrics to anon, authenticated;
+
 drop policy if exists "profiles read self or admin" on public.profiles;
-create policy "profiles read self or admin" on public.profiles for select to authenticated
-using (id = auth.uid() or public.is_admin());
 drop policy if exists "admins update profiles" on public.profiles;
-create policy "admins update profiles" on public.profiles for update to authenticated
-using (public.is_admin()) with check (public.is_admin());
+
 drop policy if exists "users read actions" on public.hse_actions;
-create policy "users read actions" on public.hse_actions for select to authenticated using (true);
 drop policy if exists "hse create actions" on public.hse_actions;
-create policy "hse create actions" on public.hse_actions for insert to authenticated
-with check (public.can_edit_hse() and created_by = auth.uid());
 drop policy if exists "hse update actions" on public.hse_actions;
-create policy "hse update actions" on public.hse_actions for update to authenticated
-using (public.can_edit_hse()) with check (public.can_edit_hse());
 drop policy if exists "admin delete actions" on public.hse_actions;
-create policy "admin delete actions" on public.hse_actions for delete to authenticated using (public.is_admin());
+create policy "public read actions" on public.hse_actions for select to anon, authenticated using (true);
 
 drop policy if exists "users read incidents" on public.hse_incidents;
-create policy "users read incidents" on public.hse_incidents for select to authenticated using (true);
 drop policy if exists "hse create incidents" on public.hse_incidents;
-create policy "hse create incidents" on public.hse_incidents for insert to authenticated
-with check (public.can_edit_hse() and created_by = auth.uid());
 drop policy if exists "hse update incidents" on public.hse_incidents;
-create policy "hse update incidents" on public.hse_incidents for update to authenticated
-using (public.can_edit_hse()) with check (public.can_edit_hse());
 drop policy if exists "admin delete incidents" on public.hse_incidents;
-create policy "admin delete incidents" on public.hse_incidents for delete to authenticated using (public.is_admin());
+create policy "public read incidents" on public.hse_incidents for select to anon, authenticated using (true);
 
 drop policy if exists "users read metrics" on public.hse_metrics;
-create policy "users read metrics" on public.hse_metrics for select to authenticated using (true);
 drop policy if exists "hse manage metrics" on public.hse_metrics;
-create policy "hse manage metrics" on public.hse_metrics for all to authenticated
-using (public.can_edit_hse()) with check (public.can_edit_hse());
+create policy "public read metrics" on public.hse_metrics for select to anon, authenticated using (true);
 
--- Bootstrap: after creating your first account, run this once with its auth.users UUID:
--- update public.profiles set role='admin' where id='YOUR_AUTH_USER_UUID';
--- Never expose the Supabase service_role key in the frontend.
+-- Public users can view dashboard data but cannot create, edit, or delete records.
