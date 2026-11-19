@@ -4,13 +4,13 @@ import { ResponsiveContainer, BarChart, Bar, LineChart, Line, PieChart, Pie, Cel
 
 const COLORS=['#ffbd19','#f36b4a','#2386f4','#7555c7','#0b9b83','#a9b5c6'];
 const types=[['bar','Barres'],['line','Courbe'],['pie','Camembert']];
-const dimensions=[['label','Libellé KPI'],['department','Département'],['period','Date de début de période']];
+const dimensions=[['metric_label','Libellé KPI'],['department','Département'],['period_start','Date de début de période']];
 const inputStyle={padding:'10px 12px',border:'1px solid #d7e0e9',borderRadius:8,width:'100%',background:'#fff',color:'#183858'};
 const buttonStyle={border:0,borderRadius:8,padding:'10px 14px',fontWeight:700,cursor:'pointer'};
 function ChartCard({config,metrics,onEdit,onDelete,onToggle,canEdit}) {
  const selected=metrics.filter(m=>(config.metric_keys||[]).includes(m.id));
  const grouped={};
- selected.forEach(m=>{const x=config.dimension==='department'?(m.department||'Non renseigné'):config.dimension==='period'?(m.period_start||'Sans date'):(m.metric_label||m.metric_key);grouped[x]=(grouped[x]||0)+Number(m.metric_value||0)});
+ selected.forEach(m=>{const x=config.dimension==='department'?(m.department||'Non renseigné'):config.dimension==='period_start'?(m.period_start||'Sans date'):(m.metric_label||m.metric_key);grouped[x]=(grouped[x]||0)+Number(m.metric_value||0)});
  const data=Object.entries(grouped).map(([name,value])=>({name,value}));
  const chart=<ResponsiveContainer width="100%" height={260}>{config.chart_type==='line'?<LineChart data={data}><CartesianGrid strokeDasharray="3 3"/><XAxis dataKey="name"/><YAxis/><Tooltip/><Line dataKey="value" name={config.title} stroke="#2386f4" strokeWidth={3}/></LineChart>:config.chart_type==='pie'?<PieChart><Pie data={data} dataKey="value" nameKey="name" outerRadius={90} label>{data.map((d,i)=><Cell key={d.name} fill={COLORS[i%COLORS.length]}/>)}</Pie><Tooltip/><Legend/></PieChart>:<BarChart data={data}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name"/><YAxis/><Tooltip/><Bar dataKey="value" name={config.title} fill="#2386f4" radius={[5,5,0,0]}/></BarChart>}</ResponsiveContainer>;
  return <section style={{background:'#fff',border:'1px solid #e4eaf0',borderRadius:14,padding:18,minWidth:0,boxShadow:'0 5px 18px #1838580a'}}>
