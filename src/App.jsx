@@ -13,9 +13,9 @@ import {
 const COLORS=['#ffbd19','#f36b4a','#2386f4','#7555c7','#0b9b83','#a9b5c6'];
 const demo={
   kpis:[['Days without LTI',38,'Current streak'],['LTI',1,'Lost time injuries'],['WLD',28,'Work-related days lost'],['Near Miss',5,'Reported events']],
-  manhours:[{month:'Jan',direct:31,indirect:76},{month:'Feb',direct:34,indirect:85},{month:'Mar',direct:26,indirect:84},{month:'Apr',direct:27,indirect:84},{month:'May',direct:27,indirect:84},{month:'Jun',direct:87,indirect:103},{month:'Jul',direct:68,indirect:29}],
-  rates:[{month:'Jan',fr:0,sr:0},{month:'Feb',fr:0,sr:0},{month:'Mar',fr:0,sr:0},{month:'Apr',fr:0,sr:0},{month:'May',fr:0,sr:0},{month:'Jun',fr:0,sr:0},{month:'Jul',fr:1,sr:25}],
-  moments:[{name:'June',value:207},{name:'July',value:345},{name:'May',value:309},{name:'April',value:138},{name:'March',value:204}],
+  manhours:[{month:'January',direct:31,indirect:76},{month:'February',direct:34,indirect:85},{month:'March',direct:26,indirect:84},{month:'April',direct:27,indirect:84},{month:'May',direct:27,indirect:84},{month:'June',direct:87,indirect:103},{month:'July',direct:68,indirect:29},{month:'August',direct:70,indirect:35},{month:'September',direct:75,indirect:32}],
+  rates:[{month:'January',fr:0,sr:0},{month:'February',fr:0,sr:0},{month:'March',fr:0,sr:0},{month:'April',fr:0,sr:0},{month:'May',fr:0,sr:0},{month:'June',fr:0,sr:0},{month:'July',fr:1,sr:25},{month:'August',fr:2,sr:50},{month:'September',fr:2,sr:88}],
+  moments:[{name:'January',value:182},{name:'February',value:204},{name:'March',value:138},{name:'April',value:309},{name:'May',value:345},{name:'June',value:207},{name:'July',value:224},{name:'August',value:258}],
   ptw:[{name:'Confined space',value:51.65},{name:'Hot work',value:28.57},{name:'Work at height',value:13.19},{name:'Lifting',value:5.49}],
   inspections:[25,9,12,32,14,22,30,16],
   inductions:[15,9,8,16,24,57,8,17,26],
