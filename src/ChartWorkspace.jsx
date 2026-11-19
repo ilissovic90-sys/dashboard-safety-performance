@@ -22,11 +22,11 @@ function ChartCard({config,metrics,onEdit,onDelete,onToggle,canEdit}) {
 }
 export default function ChartWorkspace({supabase,canEdit,mode='management'}) {
  const [metrics,setMetrics]=useState([]),[charts,setCharts]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState('');
- const [editing,setEditing]=useState(null),[title,setTitle]=useState(''),[type,setType]=useState('bar'),[dimension,setDimension]=useState('label'),[selected,setSelected]=useState([]);
+ const [editing,setEditing]=useState(null),[title,setTitle]=useState(''),[type,setType]=useState('bar'),[dimension,setDimension]=useState('metric_label'),[selected,setSelected]=useState([]);
  const [filter,setFilter]=useState('');
  async function load(){setLoading(true);setError('');const [m,c]=await Promise.all([supabase.from('hse_metrics').select('*').order('metric_label'),supabase.from('hse_chart_configs').select('*').order('created_at',{ascending:false})]);if(m.error||c.error){setError((m.error||c.error).message);setLoading(false);return}setMetrics(m.data||[]);setCharts(c.data||[]);setLoading(false)}
  useEffect(()=>{load()},[]);
- function reset(){setEditing(null);setTitle('');setType('bar');setDimension('label');setSelected([])}
+ function reset(){setEditing(null);setTitle('');setType('bar');setDimension('metric_label');setSelected([])}
  function startEdit(c){setEditing(c.id);setTitle(c.title);setType(c.chart_type);setDimension(c.dimension);setSelected(c.metric_keys||[]);window.scrollTo({top:0,behavior:'smooth'})}
  async function save(e){e.preventDefault();if(!title.trim()||selected.length===0)return;const payload={title:title.trim(),chart_type:type,dimension,metric_keys:selected,visible:true};const result=editing?await supabase.from('hse_chart_configs').update(payload).eq('id',editing):await supabase.from('hse_chart_configs').insert({...payload,created_by:(await supabase.auth.getUser()).data.user?.id});if(result.error){setError(result.error.message);return}reset();await load()}
  async function remove(id){if(!window.confirm('Supprimer ce graphique ?'))return;const {error}=await supabase.from('hse_chart_configs').delete().eq('id',id);if(error){setError(error.message);return}await load()}
